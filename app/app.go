@@ -37,18 +37,13 @@ func (app *App) setupRouting() {
 	app.echo.POST("/donor/register", app.api.AuthHandler.RegisterDonor)
 }
 
-func (app *App) setup() {
+func Run() {
 	// Register with service registry
 	discovery.SetupServiceRegistry()
 
 	// Connect to db
 	database.SetupDatabase()
 
-	// Setup routing
-	app.setupRouting()
-}
-
-func Run() {
 	fx.New(
 		fx.Provide(
 			newApp,
@@ -58,7 +53,7 @@ func Run() {
 		auth.AuthModule,
 
 		fx.Invoke(func(app *App) {
-			app.setup()
+			app.setupRouting()
 
 			go app.echo.Start(":8090")
 			fmt.Println("Server started at http://localhost:8090")

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/charitan-go/auth-server/domain/auth/model"
 	"github.com/charitan-go/auth-server/pkg/database"
 	"gorm.io/gorm"
@@ -16,6 +18,13 @@ type authRepositoryImpl struct {
 }
 
 func NewAuthRepository() AuthRepository {
+	db := database.DB
+	if db == nil {
+		fmt.Println("db is nil")
+	} else {
+		fmt.Println("db is not nil")
+	}
+
 	return &authRepositoryImpl{db: database.DB}
 }
 
