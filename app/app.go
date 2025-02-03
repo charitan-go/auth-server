@@ -7,6 +7,7 @@ import (
 	"github.com/charitan-go/auth-server/domain/auth"
 	"github.com/charitan-go/auth-server/pkg/database"
 	"github.com/charitan-go/auth-server/pkg/discovery"
+	"github.com/charitan-go/auth-server/pkg/proto"
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
@@ -43,6 +44,11 @@ func Run() {
 
 	// Connect to db
 	database.SetupDatabase()
+
+	// Setup GRPC Service Server
+
+	// Setup GRPC Service Client
+	proto.SetupGrpcServiceClient()
 
 	fx.New(
 		fx.Provide(
