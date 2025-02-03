@@ -50,11 +50,11 @@ func (app *App) setup() {
 
 func Run() {
 	fx.New(
-		auth.AuthModule,
 		fx.Provide(
 			newApp,
 			newEcho,
 			api.NewApi,
+			auth.AuthModule,
 		),
 
 		fx.Invoke(func(app *App) {
