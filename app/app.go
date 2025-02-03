@@ -54,8 +54,8 @@ func Run() {
 			newApp,
 			newEcho,
 			api.NewApi,
-			auth.AuthModule,
 		),
+		auth.AuthModule,
 
 		fx.Invoke(func(app *App) {
 			app.setup()

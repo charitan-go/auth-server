@@ -17,7 +17,7 @@ func (h *AuthHandler) CheckHealth() string {
 }
 
 func NewAuthHandler(svc service.AuthService) *AuthHandler {
-	return &AuthHandler{}
+	return &AuthHandler{svc: svc}
 }
 
 func (h *AuthHandler) RegisterDonor(c echo.Context) error {
