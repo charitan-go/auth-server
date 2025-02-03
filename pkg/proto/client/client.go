@@ -1,4 +1,4 @@
-package proto
+package protoclient
 
 import "github.com/charitan-go/auth-server/pkg/proto/client/profile"
 
