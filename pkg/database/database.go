@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/charitan-go/auth-server/domain/auth/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -29,9 +30,21 @@ func connect() error {
 	return err
 }
 
+func migrate() error {
+	if err := DB.AutoMigrate(&model.Auth{}); err != nil {
+		fmt.Println("Migrate failed")
+		return err
+	}
+
+	return nil
+}
+
 func SetupDatabase() error {
-	err := connect()
-	if err != nil {
+	if err := connect(); err != nil {
+		return err
+	}
+
+	if err := migrate(); err != nil {
 		return err
 	}
 
