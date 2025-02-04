@@ -5,9 +5,9 @@ import (
 
 	"github.com/charitan-go/auth-server/api"
 	"github.com/charitan-go/auth-server/domain/auth"
+	"github.com/charitan-go/auth-server/domain/profile"
 	"github.com/charitan-go/auth-server/pkg/database"
 	"github.com/charitan-go/auth-server/pkg/discovery"
-	protoclient "github.com/charitan-go/auth-server/pkg/proto/client"
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
@@ -47,21 +47,20 @@ func Run() {
 
 	// TODO: Setup GRPC Service Server
 
-	// Setup GRPC Service Client
-	protoclient.SetupGrpcServiceClient()
-
 	fx.New(
+		profile.ProfileModule,
+		auth.AuthModule,
 		fx.Provide(
 			newApp,
 			newEcho,
 			api.NewApi,
 		),
-		auth.AuthModule,
 
 		fx.Invoke(func(app *App) {
 			app.setupRouting()
 
-			go app.echo.Start(":8090")
+			// go app.echo.Start(":8090")
+			app.echo.Start(":8090")
 			fmt.Println("Server started at http://localhost:8090")
 		}),
 	).Run()
