@@ -60,10 +60,10 @@ func DiscoverService(serviceName string) string {
 
 	// Look for the gRPC service explicitly
 	if service, ok := services[serviceName]; ok {
-		log.Printf("Found gRPC service at: %s:%d", service.Address, service.Port)
+		log.Printf("Found %s service at: %s:%d", serviceName, service.Address, service.Port)
 		return service.Address + ":" + strconv.Itoa(service.Port)
 	}
 
-	log.Fatalf("Service profile-service-grpc not found in Consul")
+	log.Fatalf("Service %s not found in Consul", serviceName)
 	return ""
 }

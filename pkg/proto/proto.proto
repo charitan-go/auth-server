@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option go_package = "./pkg/proto";
 
-service ProfileService {
+service ProfileProtoService {
   rpc CreateDonorProfile(CreateDonorProfileRequestDto)
       returns (CreateDonorProfileResponseDto);
 }

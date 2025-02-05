@@ -46,7 +46,7 @@ func (c *profileProtoClientImpl) CreateDonorProfile(reqDto *proto.CreateDonorPro
 	defer conn.Close()
 
 	// Create a client
-	client := proto.NewProfileServiceClient(conn)
+	client := proto.NewProfileProtoServiceClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()

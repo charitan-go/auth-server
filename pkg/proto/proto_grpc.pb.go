@@ -19,101 +19,101 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ProfileService_CreateDonorProfile_FullMethodName = "/ProfileService/CreateDonorProfile"
+	ProfileProtoService_CreateDonorProfile_FullMethodName = "/ProfileProtoService/CreateDonorProfile"
 )
 
-// ProfileServiceClient is the client API for ProfileService service.
+// ProfileProtoServiceClient is the client API for ProfileProtoService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ProfileServiceClient interface {
+type ProfileProtoServiceClient interface {
 	CreateDonorProfile(ctx context.Context, in *CreateDonorProfileRequestDto, opts ...grpc.CallOption) (*CreateDonorProfileResponseDto, error)
 }
 
-type profileServiceClient struct {
+type profileProtoServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewProfileServiceClient(cc grpc.ClientConnInterface) ProfileServiceClient {
-	return &profileServiceClient{cc}
+func NewProfileProtoServiceClient(cc grpc.ClientConnInterface) ProfileProtoServiceClient {
+	return &profileProtoServiceClient{cc}
 }
 
-func (c *profileServiceClient) CreateDonorProfile(ctx context.Context, in *CreateDonorProfileRequestDto, opts ...grpc.CallOption) (*CreateDonorProfileResponseDto, error) {
+func (c *profileProtoServiceClient) CreateDonorProfile(ctx context.Context, in *CreateDonorProfileRequestDto, opts ...grpc.CallOption) (*CreateDonorProfileResponseDto, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateDonorProfileResponseDto)
-	err := c.cc.Invoke(ctx, ProfileService_CreateDonorProfile_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ProfileProtoService_CreateDonorProfile_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ProfileServiceServer is the server API for ProfileService service.
-// All implementations must embed UnimplementedProfileServiceServer
+// ProfileProtoServiceServer is the server API for ProfileProtoService service.
+// All implementations must embed UnimplementedProfileProtoServiceServer
 // for forward compatibility.
-type ProfileServiceServer interface {
+type ProfileProtoServiceServer interface {
 	CreateDonorProfile(context.Context, *CreateDonorProfileRequestDto) (*CreateDonorProfileResponseDto, error)
-	mustEmbedUnimplementedProfileServiceServer()
+	mustEmbedUnimplementedProfileProtoServiceServer()
 }
 
-// UnimplementedProfileServiceServer must be embedded to have
+// UnimplementedProfileProtoServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedProfileServiceServer struct{}
+type UnimplementedProfileProtoServiceServer struct{}
 
-func (UnimplementedProfileServiceServer) CreateDonorProfile(context.Context, *CreateDonorProfileRequestDto) (*CreateDonorProfileResponseDto, error) {
+func (UnimplementedProfileProtoServiceServer) CreateDonorProfile(context.Context, *CreateDonorProfileRequestDto) (*CreateDonorProfileResponseDto, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateDonorProfile not implemented")
 }
-func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
-func (UnimplementedProfileServiceServer) testEmbeddedByValue()                        {}
+func (UnimplementedProfileProtoServiceServer) mustEmbedUnimplementedProfileProtoServiceServer() {}
+func (UnimplementedProfileProtoServiceServer) testEmbeddedByValue()                             {}
 
-// UnsafeProfileServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ProfileServiceServer will
+// UnsafeProfileProtoServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ProfileProtoServiceServer will
 // result in compilation errors.
-type UnsafeProfileServiceServer interface {
-	mustEmbedUnimplementedProfileServiceServer()
+type UnsafeProfileProtoServiceServer interface {
+	mustEmbedUnimplementedProfileProtoServiceServer()
 }
 
-func RegisterProfileServiceServer(s grpc.ServiceRegistrar, srv ProfileServiceServer) {
-	// If the following call pancis, it indicates UnimplementedProfileServiceServer was
+func RegisterProfileProtoServiceServer(s grpc.ServiceRegistrar, srv ProfileProtoServiceServer) {
+	// If the following call pancis, it indicates UnimplementedProfileProtoServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&ProfileService_ServiceDesc, srv)
+	s.RegisterService(&ProfileProtoService_ServiceDesc, srv)
 }
 
-func _ProfileService_CreateDonorProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ProfileProtoService_CreateDonorProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateDonorProfileRequestDto)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServiceServer).CreateDonorProfile(ctx, in)
+		return srv.(ProfileProtoServiceServer).CreateDonorProfile(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ProfileService_CreateDonorProfile_FullMethodName,
+		FullMethod: ProfileProtoService_CreateDonorProfile_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceServer).CreateDonorProfile(ctx, req.(*CreateDonorProfileRequestDto))
+		return srv.(ProfileProtoServiceServer).CreateDonorProfile(ctx, req.(*CreateDonorProfileRequestDto))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
+// ProfileProtoService_ServiceDesc is the grpc.ServiceDesc for ProfileProtoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ProfileService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ProfileService",
-	HandlerType: (*ProfileServiceServer)(nil),
+var ProfileProtoService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ProfileProtoService",
+	HandlerType: (*ProfileProtoServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateDonorProfile",
-			Handler:    _ProfileService_CreateDonorProfile_Handler,
+			Handler:    _ProfileProtoService_CreateDonorProfile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
