@@ -37,7 +37,7 @@ func NewProfileProtoClient() ProfileProtoClient {
 // }
 
 func (c *profileProtoClientImpl) CreateDonorProfile(reqDto *proto.CreateDonorProfileRequestDto) (*proto.CreateDonorProfileResponseDto, error) {
-	profileServerAddress := discovery.DiscoverService("profile-server")
+	profileServerAddress := discovery.DiscoverService("profile-server-grpc")
 	// Connect to the gRPC server
 	conn, err := grpc.NewClient(profileServerAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

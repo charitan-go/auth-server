@@ -47,20 +47,22 @@ func SetupServiceRegistry() {
 
 func DiscoverService(serviceName string) string {
 	config := consulapi.DefaultConfig()
-	client, err := consulapi.NewClient(config)
+	consul, err := consulapi.NewClient(config)
 	if err != nil {
 		log.Fatalf("Failed to create Consul client: %v", err)
 	}
 
-	services, err := client.Agent().Services()
+	services, err := consul.Agent().Services()
 	if err != nil {
 		log.Fatalf("Failed to retrieve services from Consul: %v", err)
 	}
 
+	// Look for the gRPC service explicitly
 	if service, ok := services[serviceName]; ok {
+		log.Printf("Found gRPC service at: %s:%d", service.Address, service.Port)
 		return service.Address + ":" + strconv.Itoa(service.Port)
 	}
 
-	log.Fatalf("Service %s not found in Consul", serviceName)
+	log.Fatalf("Service profile-service-grpc not found in Consul")
 	return ""
 }
