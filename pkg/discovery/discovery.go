@@ -47,6 +47,7 @@ func SetupServiceRegistry() {
 
 func DiscoverService(serviceName string) string {
 	config := consulapi.DefaultConfig()
+	config.Address = os.Getenv("SERVICE_REGISTRY_URI")
 	consul, err := consulapi.NewClient(config)
 	if err != nil {
 		log.Fatalf("Failed to create Consul client: %v", err)
