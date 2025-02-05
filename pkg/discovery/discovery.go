@@ -2,6 +2,7 @@ package discovery
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -42,4 +43,24 @@ func SetupServiceRegistry() {
 	} else {
 		fmt.Printf("successfully register service: %s:%v\n", address, port)
 	}
+}
+
+func DiscoverService(serviceName string) string {
+	config := consulapi.DefaultConfig()
+	client, err := consulapi.NewClient(config)
+	if err != nil {
+		log.Fatalf("Failed to create Consul client: %v", err)
+	}
+
+	services, err := client.Agent().Services()
+	if err != nil {
+		log.Fatalf("Failed to retrieve services from Consul: %v", err)
+	}
+
+	if service, ok := services[serviceName]; ok {
+		return service.Address + ":" + strconv.Itoa(service.Port)
+	}
+
+	log.Fatalf("Service %s not found in Consul", serviceName)
+	return ""
 }

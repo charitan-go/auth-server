@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/charitan-go/auth-server/pkg/discovery"
 	"github.com/charitan-go/auth-server/pkg/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -36,8 +37,9 @@ func NewProfileProtoClient() ProfileProtoClient {
 // }
 
 func (c *profileProtoClientImpl) CreateDonorProfile(reqDto *proto.CreateDonorProfileRequestDto) (*proto.CreateDonorProfileResponseDto, error) {
+	profileServerAddress := discovery.DiscoverService("profile-server")
 	// Connect to the gRPC server
-	conn, err := grpc.NewClient(PROFILE_GRPC_SERVER_ADDRESS, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(profileServerAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, fmt.Errorf("connection failed: %v", err)
 	}

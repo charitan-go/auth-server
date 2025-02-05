@@ -40,7 +40,7 @@ func (svc *authServiceImpl) RegisterDonor(req dto.RegisterDonorRequestDto) (*dto
 	// createDonorProfileResponseDto, err := protoclient.ProfileClient.CreateDonorProfile(*protoclient.ProfileCtx, createDonorProfile)
 	createDonorProfileResponseDto, err := svc.profileProtoClient.CreateDonorProfile(createDonorProfileRequestDto)
 	if err != nil {
-		fmt.Println("Cannot send to profile-server")
+		fmt.Printf("Cannot send to profile-server: %v\n", err)
 	}
 	profileReadableId := createDonorProfileResponseDto.GetProfileReadableId()
 	fmt.Println("ProfileReabableid = ", profileReadableId)
