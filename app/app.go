@@ -1,67 +1,98 @@
 package app
 
 import (
-	"fmt"
+	"log"
 
-	"github.com/charitan-go/auth-server/api"
-	"github.com/charitan-go/auth-server/domain/auth"
-	"github.com/charitan-go/auth-server/domain/profile"
+	"github.com/charitan-go/auth-server/external/profile"
+	"github.com/charitan-go/auth-server/internal/auth"
 	"github.com/charitan-go/auth-server/pkg/database"
-	"github.com/charitan-go/auth-server/pkg/discovery"
+	"github.com/charitan-go/auth-server/rest"
+	"github.com/charitan-go/auth-server/rest/api"
 
-	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 )
 
-type App struct {
-	echo *echo.Echo
+// type App struct {
+// 	echo *echo.Echo
+//
+// 	api *api.Api
+// }
+//
+// func newApp(echo *echo.Echo, api *api.Api) *App {
+// 	return &App{
+// 		echo: echo,
+// 		api:  api,
+// 	}
+// }
+//
+// func newEcho() *echo.Echo {
+// 	return echo.New()
+// }
+//
+// func (app *App) setupRouting() {
+// 	// Health Check
+// 	app.echo.GET("/health", app.api.HealthCheck)
+//
+// 	// Auth
+// 	app.echo.POST("/donor/register", app.api.AuthHandler.RegisterDonor)
+// }
+//
+// func Run() {
+// 	// Register with service registry
+// 	discovery.SetupServiceRegistry()
+//
+// 	// Connect to db
+// 	database.SetupDatabase()
+//
+// 	// TODO: Setup GRPC Service Server
+//
+// 	fx.New(
+// 		profile.ProfileModule,
+// 		auth.AuthModule,
+// 		fx.Provide(
+// 			newApp,
+// 			newEcho,
+// 			api.NewApi,
+// 		),
+//
+// 		fx.Invoke(func(app *App) {
+// 			app.setupRouting()
+//
+// 			// go app.echo.Start(":8090")
+// 			app.echo.Start(":8090")
+// 			fmt.Println("Server started at http://localhost:8090")
+// 		}),
+// 	).Run()
+// }
 
-	api *api.Api
-}
+// Run both servers concurrently
+func runServers(restSrv *rest.RestServer) {
+	log.Println("In invoke")
+	// Start REST server
+	go func() {
+		log.Println("In goroutine of rest")
+		restSrv.Run()
+	}()
 
-func newApp(echo *echo.Echo, api *api.Api) *App {
-	return &App{
-		echo: echo,
-		api:  api,
-	}
-}
-
-func newEcho() *echo.Echo {
-	return echo.New()
-}
-
-func (app *App) setupRouting() {
-	// Health Check
-	app.echo.GET("/health", app.api.HealthCheck)
-
-	// Auth
-	app.echo.POST("/donor/register", app.api.AuthHandler.RegisterDonor)
+	// Start gRPC server
+	// go func() {
+	// 	log.Println("In goroutine of grpc")
+	// 	grpcSrv.Run()
+	// }()
 }
 
 func Run() {
-	// Register with service registry
-	discovery.SetupServiceRegistry()
-
 	// Connect to db
 	database.SetupDatabase()
 
-	// TODO: Setup GRPC Service Server
-
 	fx.New(
-		profile.ProfileModule,
 		auth.AuthModule,
+		profile.ProfileModule,
 		fx.Provide(
-			newApp,
-			newEcho,
+			rest.NewRestServer,
+			rest.NewEcho,
 			api.NewApi,
 		),
-
-		fx.Invoke(func(app *App) {
-			app.setupRouting()
-
-			// go app.echo.Start(":8090")
-			app.echo.Start(":8090")
-			fmt.Println("Server started at http://localhost:8090")
-		}),
+		fx.Invoke(runServers),
 	).Run()
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charitan-go/auth-server/domain/auth/model"
+	"github.com/charitan-go/auth-server/internal/auth/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
