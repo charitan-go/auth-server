@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello")
+	log.Println("Hello")
 	app.Run()
 }

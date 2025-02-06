@@ -24,7 +24,7 @@ func connect() error {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err == nil {
-		fmt.Println("Connect to database success")
+		log.Println("Connect to database success")
 	}
 
 	return err
@@ -32,7 +32,7 @@ func connect() error {
 
 func migrate() error {
 	if err := DB.AutoMigrate(&model.Auth{}); err != nil {
-		fmt.Println("Migrate failed")
+		log.Println("Migrate failed")
 		return err
 	}
 

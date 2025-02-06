@@ -60,7 +60,7 @@ import (
 //
 // 			// go app.echo.Start(":8090")
 // 			app.echo.Start(":8090")
-// 			fmt.Println("Server started at http://localhost:8090")
+// 			log.Println("Server started at http://localhost:8090")
 // 		}),
 // 	).Run()
 // }

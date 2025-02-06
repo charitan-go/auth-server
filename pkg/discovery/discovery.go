@@ -32,13 +32,13 @@ func DiscoverService(serviceName string) string {
 }
 
 // func SetupServiceRegistry() {
-// 	fmt.Println("Start for service discovery")
+// 	log.Println("Start for service discovery")
 //
 // 	config := consulapi.DefaultConfig()
 // 	config.Address = os.Getenv("SERVICE_REGISTRY_URI")
 // 	consul, err := consulapi.NewClient(config)
 // 	if err != nil {
-// 		fmt.Println("Cannot connect with service registry", err)
+// 		log.Println("Cannot connect with service registry", err)
 // 	}
 //
 // 	serviceId := os.Getenv("SERVICE_ID")
@@ -60,9 +60,9 @@ func DiscoverService(serviceName string) string {
 //
 // 	err = consul.Agent().ServiceRegister(registration)
 // 	if err != nil {
-// 		fmt.Println(err)
-// 		fmt.Printf("Failed to register service: %s:%v\n", address, port)
+// 		log.Println(err)
+// 		log.Printf("Failed to register service: %s:%v\n", address, port)
 // 	} else {
-// 		fmt.Printf("successfully register service: %s:%v\n", address, port)
+// 		log.Printf("successfully register service: %s:%v\n", address, port)
 // 	}
 // }
