@@ -12,6 +12,7 @@ require (
 	google.golang.org/protobuf v1.36.4
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
+	github.com/golang-jwt/jwt/v5 v5.2.1
 )
 
 require (
@@ -49,6 +50,5 @@ require (
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241202173237-19429a94021a // indirect
 )
