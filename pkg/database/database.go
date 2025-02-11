@@ -41,7 +41,7 @@ func migrate() error {
 }
 
 func seedData() error {
-	sqlScript, err := os.ReadFile("resource/seed.sql")
+	sqlScript, err := os.ReadFile("resource/data.sql")
 	if err != nil {
 		log.Fatalf("Failed to read SQL script: %v", err)
 	}

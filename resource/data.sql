@@ -1,5 +1,5 @@
 -- Seed data for the auth table
-INSERT INTO auth (email, hashed_password, role, profile_readable_id)
+INSERT INTO auths (email, hashed_password, role, profile_readable_id)
 VALUES 
     ('donor1@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'DONOR', gen_random_uuid()),
     ('donor2@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'DONOR', gen_random_uuid()),
