@@ -16,9 +16,11 @@ type JwtService interface {
 }
 
 type jwtServiceImpl struct {
-	privateKey            *rsa.PrivateKey
-	publicKey             *rsa.PublicKey
+	privateKey *rsa.PrivateKey
+	publicKey  *rsa.PublicKey
+
 	jwtExpirationDuration time.Duration
+	jwtIssuer             string
 }
 
 type JwtClaims struct {
@@ -40,6 +42,7 @@ func NewJwtService() JwtService {
 }
 
 func (s *jwtServiceImpl) readConfig() {
+	// Read JWT_EXPIRATION_DURATION
 	jwtExpirationDurationStr := os.Getenv("JWT_EXPIRATION_DURATION")
 	if jwtExpirationDurationStr == "" {
 		log.Fatalln("Error in reading JWT_EXPIRATION_DURATION")
@@ -49,6 +52,12 @@ func (s *jwtServiceImpl) readConfig() {
 		log.Fatalln("Error in parsing jwt expiration duration")
 	} else {
 		s.jwtExpirationDuration = jwtExpirationDuration
+	}
+
+	// Read JWT_ISSUER
+	s.jwtIssuer = os.Getenv("JWT_ISSUER")
+	if s.jwtIssuer == "" {
+		s.jwtIssuer = "charitan-go"
 	}
 }
 
@@ -60,8 +69,27 @@ func (s *jwtServiceImpl) generateRSAKeyPair(bits int) {
 }
 
 func (s *jwtServiceImpl) SignToken(authModel *model.Auth) (string, error) {
-	// TODO: Impl
-	expirationTime := time.Now().Add(os.Getenv("JWT_EXPIRATION"))
-	return "", nil
+	// Read expiration time
+	expirationTime := time.Now().Add(s.jwtExpirationDuration)
 
+	// Get claims
+	claims := &JwtClaims{
+		Sub:  authModel.ReadableId.String(),
+		Role: string(authModel.Role),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Issuer:    s.jwtIssuer,
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+
+	// Sign the token with the private key
+	tokenString, err := token.SignedString(s.privateKey)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
