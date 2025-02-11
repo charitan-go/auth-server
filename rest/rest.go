@@ -31,11 +31,13 @@ func NewRestServer(echo *echo.Echo, api *api.Api) *RestServer {
 func (s *RestServer) setupRouting() {
 	s.echo.GET("/health", s.api.HealthCheck)
 
-	// Endpoint for all users
+	// Non auth endpoint
 	s.echo.POST("/login", s.api.AuthHandler.Login)
-
-	// Endpoint for donor
 	s.echo.POST("/donor/register", s.api.AuthHandler.RegisterDonor)
+
+	// Endpoint for all users
+	s.echo.GET("/user/me", s.api.AuthHandler.GetMe)
+
 }
 
 func (s *RestServer) setupMiddleware() {
