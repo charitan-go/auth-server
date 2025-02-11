@@ -15,7 +15,7 @@ import (
 )
 
 type AuthService interface {
-	LoginUser(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto)
+	Login(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto)
 	RegisterDonor(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto)
 }
 
@@ -82,7 +82,7 @@ func (svc *authServiceImpl) RegisterDonor(req *dto.RegisterDonorRequestDto) (*dt
 }
 
 // LoginUser implements AuthService.
-func (svc *authServiceImpl) LoginUser(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto) {
+func (svc *authServiceImpl) Login(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto) {
 	// TODO: Implements
 	return &dto.LoginUserResponseDto{Token: "312321312312"}, nil
 }

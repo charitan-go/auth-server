@@ -1,8 +1,7 @@
 package repository
 
 import (
-	"fmt"
-
+  "log"
 	"github.com/charitan-go/auth-server/internal/auth/model"
 	"github.com/charitan-go/auth-server/pkg/database"
 	"gorm.io/gorm"

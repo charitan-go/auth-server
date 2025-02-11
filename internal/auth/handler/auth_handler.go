@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/charitan-go/auth-server/internal/auth/dto"
@@ -21,14 +22,15 @@ func NewAuthHandler(svc service.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) RegisterDonor(c echo.Context) error {
-	var req dto.RegisterDonorRequestDto
+	log.Println("In register donor")
 
-	err := c.Bind(&req)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, dto.ErrorResponseDto{Message: "Invalid request body"})
+	req := new(dto.RegisterDonorRequestDto)
+	if err := c.Bind(req); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, dto.ErrorResponseDto{Message: "Invalid request bodyy", StatusCode: http.StatusBadRequest})
 	}
 
-	res, errRes := h.svc.RegisterDonor(&req)
+	res, errRes := h.svc.RegisterDonor(req)
 	if errRes != nil {
 		return c.JSON(int(errRes.StatusCode), *errRes)
 	}
@@ -36,7 +38,7 @@ func (h *AuthHandler) RegisterDonor(c echo.Context) error {
 	return c.JSON(http.StatusCreated, *res)
 }
 
-func (h *AuthHandler) LoginUser(c echo.Context) error {
+func (h *AuthHandler) Login(c echo.Context) error {
 	var req dto.LoginUserRequestDto
 
 	err := c.Bind(&req)
@@ -44,7 +46,7 @@ func (h *AuthHandler) LoginUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponseDto{Message: "Invalid request body"})
 	}
 
-	res, errRes := h.svc.LoginUser(&req)
+	res, errRes := h.svc.Login(&req)
 	if errRes != nil {
 		return c.JSON(int(errRes.StatusCode), *errRes)
 	}
