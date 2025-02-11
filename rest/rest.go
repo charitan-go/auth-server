@@ -32,10 +32,14 @@ func (s *RestServer) setupRouting() {
 	s.echo.GET("/health", s.api.HealthCheck)
 
 	// Endpoint for all users
-	s.echo.POST("/user/login", s.api.AuthHandler.LoginUser)
+	s.echo.POST("/login", s.api.AuthHandler.Login)
 
 	// Endpoint for donor
 	s.echo.POST("/donor/register", s.api.AuthHandler.RegisterDonor)
+}
+
+func (s *RestServer) setupMiddleware() {
+	// s.echo.Use(middleware.CORS())
 }
 
 func (s *RestServer) setupServiceRegistry() {
@@ -75,6 +79,10 @@ func (s *RestServer) setupServiceRegistry() {
 }
 
 func (s *RestServer) setup() {
+
+	// Setup middleware
+	s.setupMiddleware()
+
 	// Setup rest api routingj
 	s.setupRouting()
 
