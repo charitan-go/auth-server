@@ -22,7 +22,6 @@ func NewAuthHandler(svc service.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) RegisterDonor(c echo.Context) error {
-	log.Println("In register donor")
 
 	req := new(dto.RegisterDonorRequestDto)
 	if err := c.Bind(req); err != nil {
