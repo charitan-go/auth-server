@@ -100,6 +100,10 @@ func (svc *authServiceImpl) Login(req *dto.LoginUserRequestDto) (*dto.LoginUserR
 	}
 
 	// Sign JWT
+	token, err := svc.jwtService.SignToken(existedUser)
+	if err != nil {
+		return nil, &dto.ErrorResponseDto{Message: "Error happen in sign token", StatusCode: http.StatusInternalServerError}
+	}
 
-	return &dto.LoginUserResponseDto{Token: "312321312312"}, nil
+	return &dto.LoginUserResponseDto{Token: token}, nil
 }
