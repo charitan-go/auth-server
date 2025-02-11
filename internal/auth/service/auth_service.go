@@ -20,12 +20,19 @@ type AuthService interface {
 }
 
 type authServiceImpl struct {
+	passwordService   PasswordService
+	jwtService        JwtService
 	r                 repository.AuthRepository
 	profileGrpcClient profile.ProfileGrpcClient
 }
 
-func NewAuthService(r repository.AuthRepository, profileProtoClient profile.ProfileGrpcClient) AuthService {
-	return &authServiceImpl{r: r, profileGrpcClient: profileProtoClient}
+func verifyPassword(hashPassword, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(password))
+	return err == nil
+}
+
+func NewAuthService(passwordService PasswordService, jwtService JwtService, r repository.AuthRepository, profileGrpcClient profile.ProfileGrpcClient) AuthService {
+	return &authServiceImpl{passwordService, jwtService, r, profileGrpcClient}
 }
 
 func (svc *authServiceImpl) RegisterDonor(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto) {
@@ -59,12 +66,10 @@ func (svc *authServiceImpl) RegisterDonor(req *dto.RegisterDonorRequestDto) (*dt
 	}
 
 	// Hash password
-	hashedPasswordByte, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	hashedPassword, err := svc.passwordService.HashPassword(req.Password)
 	if err != nil {
 		return nil, &dto.ErrorResponseDto{Message: "Error in hashedPassword", StatusCode: http.StatusInternalServerError}
 	}
-	hashedPassword := string(hashedPasswordByte)
-	_ = hashedPassword
 
 	// Save to repo
 	authModel := model.NewAuth(
@@ -83,6 +88,18 @@ func (svc *authServiceImpl) RegisterDonor(req *dto.RegisterDonorRequestDto) (*dt
 
 // LoginUser implements AuthService.
 func (svc *authServiceImpl) Login(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto) {
-	// TODO: Implements
+	// Check user existed or not
+	existedUser, err := svc.r.FindOneByEmail(req.Email)
+	if err != nil {
+		return nil, &dto.ErrorResponseDto{Message: "Invalid credentials", StatusCode: http.StatusBadRequest}
+	}
+
+	// Verify password
+	if !svc.passwordService.VerifyPassword(existedUser.HashedPassword, req.Password) {
+		return nil, &dto.ErrorResponseDto{Message: "Invalid credentials", StatusCode: http.StatusBadRequest}
+	}
+
+	// Sign JWT
+
 	return &dto.LoginUserResponseDto{Token: "312321312312"}, nil
 }

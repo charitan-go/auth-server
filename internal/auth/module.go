@@ -11,6 +11,8 @@ var AuthModule = fx.Module("auth",
 	fx.Provide(
 		handler.NewAuthHandler,
 		service.NewAuthService,
+		service.NewPasswordService,
+		service.NewJwtService,
 		repository.NewAuthRepository,
 		// profile.NewProfileProtoClient,
 	),
