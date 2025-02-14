@@ -69,12 +69,14 @@ import (
 // Run both servers concurrently
 func runServers(restSrv *rest.RestServer, rabbitmqSrv *rabbitmq.RabbitmqServer) {
 	log.Println("In invoke")
+
 	// Start REST server
 	go func() {
 		log.Println("In goroutine of rest")
 		restSrv.Run()
 	}()
 
+	// Start RabbitMQ server
 	go func() {
 		log.Println("In goroutine of rabbitmq")
 		rabbitmqSrv.Run()

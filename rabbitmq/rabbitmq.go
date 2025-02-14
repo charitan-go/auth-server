@@ -7,6 +7,7 @@ import (
 	"os"
 
 	consulapi "github.com/hashicorp/consul/api"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type RabbitmqServer struct {
@@ -64,12 +65,99 @@ func (*RabbitmqServer) setupServiceRegistry() {
 	}
 }
 
-func (*RabbitmqServer) startRabbitmqConsumer() {
-	//  log.Println("In function startRabbitmqConsumer")
-	//
-	// conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	//
-	//  log.Println("RabbitMQ server is started")
+func (*RabbitmqServer) startRabbitmqConsumer() error {
+	log.Println("In function startRabbitmqConsumer")
+
+	amqpConnectionStr := fmt.Sprintf("amqp://%s:%s@message-broker:5672",
+		os.Getenv("MESSAGE_BROKER_USER"),
+		os.Getenv("MESSAGE_BROKER_PASSWORD"))
+	conn, err := amqp.Dial(amqpConnectionStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+		return err
+	}
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	if err != nil {
+		log.Fatalf("Failed to open a channel: %v", err)
+		return err
+	}
+	defer ch.Close()
+
+	exchangeName := "AUTH_GET_PRIVATE_KEY"
+	err = ch.ExchangeDeclare(
+		exchangeName, // exchange name
+		"topic",      // type: topic
+		true,         // durable
+		false,        // auto-deleted
+		false,        // internal
+		false,        // no-wait
+		nil,          // arguments
+	)
+	if err != nil {
+		log.Fatalf("Failed to declare an exchange: %v", err)
+		return err
+	}
+
+	// Declare a queue for key notifications.
+	queueName := "KEY_QUEUE"
+	q, err := ch.QueueDeclare(
+		queueName, // name of the queue
+		true,      // durable
+		false,     // delete when unused
+		false,     // exclusive
+		false,     // no-wait
+		nil,       // arguments
+	)
+	if err != nil {
+		log.Fatalf("Failed to declare a queue: %v", err)
+		return err
+	}
+
+	// Bind the queue to the exchange with routing key "key.generated".
+	err = ch.QueueBind(
+		q.Name,                // queue name
+		"key.get.private.key", // routing key
+		exchangeName,          // exchange
+		false,                 // no-wait
+		nil,                   // arguments
+	)
+	if err != nil {
+		log.Fatalf("Failed to bind queue: %v", err)
+		return err
+	}
+
+	// Consume messages from the queue.
+	msgs, err := ch.Consume(
+		q.Name, // queue name
+		"",     // consumer tag
+		true,   // auto-acknowledge
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // arguments
+	)
+	if err != nil {
+		log.Fatalf("Failed to register a consumer: %v", err)
+		return err
+	}
+
+	forever := make(chan bool)
+
+	go func() {
+		log.Println("Inside the loop to process exchange topics")
+		for d := range msgs {
+			fmt.Printf("Received message: %s\n", d.Body)
+			// Here you might trigger a gRPC call to fetch the new key.
+		}
+	}()
+
+	fmt.Println("Waiting for messages. To exit press CTRL+C")
+	<-forever
+
+	return nil
+
 }
 
 func (s *RabbitmqServer) Run() {

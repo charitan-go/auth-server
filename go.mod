@@ -7,6 +7,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/consul/api v1.31.0
 	github.com/labstack/echo/v4 v4.13.3
+	github.com/rabbitmq/amqp091-go v1.10.0
 	go.uber.org/fx v1.23.0
 	golang.org/x/crypto v0.31.0
 	google.golang.org/grpc v1.70.0
