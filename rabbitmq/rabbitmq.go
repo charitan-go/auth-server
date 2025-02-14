@@ -85,7 +85,7 @@ func (*RabbitmqServer) startRabbitmqConsumer() error {
 	}
 	defer ch.Close()
 
-	exchangeName := "AUTH_GET_PRIVATE_KEY"
+	exchangeName := "GET_PRIVATE_KEY"
 	err = ch.ExchangeDeclare(
 		exchangeName, // exchange name
 		"topic",      // type: topic
@@ -100,28 +100,15 @@ func (*RabbitmqServer) startRabbitmqConsumer() error {
 		return err
 	}
 
-	// Declare a queue for key notifications.
-	queueName := "KEY_QUEUE"
-	q, err := ch.QueueDeclare(
-		queueName, // name of the queue
-		true,      // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
-	)
-	if err != nil {
-		log.Fatalf("Failed to declare a queue: %v", err)
-		return err
-	}
-
 	// Bind the queue to the exchange with routing key "key.generated".
+	routingKey := "key.get.private.key"
+	queueName := "KEY_QUEUE"
 	err = ch.QueueBind(
-		q.Name,                // queue name
-		"key.get.private.key", // routing key
-		exchangeName,          // exchange
-		false,                 // no-wait
-		nil,                   // arguments
+		queueName,    // queue name
+		routingKey,   // routing key
+		exchangeName, // exchange
+		false,        // no-wait
+		nil,          // arguments
 	)
 	if err != nil {
 		log.Fatalf("Failed to bind queue: %v", err)
@@ -130,13 +117,13 @@ func (*RabbitmqServer) startRabbitmqConsumer() error {
 
 	// Consume messages from the queue.
 	msgs, err := ch.Consume(
-		q.Name, // queue name
-		"",     // consumer tag
-		true,   // auto-acknowledge
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // arguments
+		queueName, // queue name
+		"",        // consumer tag
+		true,      // auto-acknowledge
+		false,     // exclusive
+		false,     // no-local
+		false,     // no-wait
+		nil,       // arguments
 	)
 	if err != nil {
 		log.Fatalf("Failed to register a consumer: %v", err)
@@ -144,16 +131,17 @@ func (*RabbitmqServer) startRabbitmqConsumer() error {
 	}
 
 	forever := make(chan bool)
-
 	go func() {
 		log.Println("Inside the loop to process exchange topics")
 		for d := range msgs {
-			fmt.Printf("Received message: %s\n", d.Body)
-			// Here you might trigger a gRPC call to fetch the new key.
+			if d.Exchange == "GET_PRIVATE_KEY" {
+				log.Printf("Received message from exchange GET_PRIVATE_KEY: %s\n", d.Body)
+			} else {
+				log.Printf("Received message from exchange %s\n", d.Exchange)
+			}
 		}
 	}()
 
-	fmt.Println("Waiting for messages. To exit press CTRL+C")
 	<-forever
 
 	return nil
@@ -168,7 +156,9 @@ func (s *RabbitmqServer) Run() {
 	s.setupServiceRegistry()
 
 	// Start health server
-	s.startHealthServer()
+	// s.startHealthServer()
+
+	log.Println("Ready to start consumer")
 
 	// Start rabbitmq consumer
 	s.startRabbitmqConsumer()
