@@ -23,6 +23,14 @@ func (*RabbitmqServer) setupHealthServer() {
 	log.Println("Health server listening on :9000")
 }
 
+func (*RabbitmqServer) startHealthServer() {
+	if err := http.ListenAndServe(":9000", nil); err != nil {
+		log.Fatalf("Health server failed: %v", err)
+	} else {
+		log.Println("Health server for RabbitMQ start at :9000")
+	}
+}
+
 func (*RabbitmqServer) setupServiceRegistry() {
 	log.Println("Start for grpc service registry")
 
@@ -56,6 +64,14 @@ func (*RabbitmqServer) setupServiceRegistry() {
 	}
 }
 
+func (*RabbitmqServer) startRabbitmqConsumer() {
+	//  log.Println("In function startRabbitmqConsumer")
+	//
+	// conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	//
+	//  log.Println("RabbitMQ server is started")
+}
+
 func (s *RabbitmqServer) Run() {
 	// Setup health server
 	s.setupHealthServer()
@@ -63,10 +79,9 @@ func (s *RabbitmqServer) Run() {
 	// Setup and connect to service registry
 	s.setupServiceRegistry()
 
-	// Setup health server
-	if err := http.ListenAndServe(":9000", nil); err != nil {
-		log.Fatalf("Health server failed: %v", err)
-	} else {
-		log.Println("Health server for RabbitMQ start at :9000")
-	}
+	// Start health server
+	s.startHealthServer()
+
+	// Start rabbitmq consumer
+	s.startRabbitmqConsumer()
 }
