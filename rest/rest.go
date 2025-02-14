@@ -35,7 +35,7 @@ func (s *RestServer) setupRouting() {
 	s.echo.POST("/login", s.api.AuthHandler.Login)
 	s.echo.POST("/donor/register", s.api.AuthHandler.RegisterDonor)
 
-	// Endpoint for all users
+	// Endpoint for all users (registricted)
 	s.echo.GET("/user/me", s.api.AuthHandler.GetMe)
 
 }
@@ -65,10 +65,9 @@ func (s *RestServer) setupServiceRegistry() {
 		Port:    8090,
 		Tags:    []string{"rest"},
 		Check: &consulapi.AgentServiceCheck{
-			HTTP:                           fmt.Sprintf("http://%s:8090/health", address),
-			Interval:                       "10s",
-			Timeout:                        "5s",
-			DeregisterCriticalServiceAfter: "30s",
+			HTTP:     fmt.Sprintf("http://%s:8090/health", address),
+			Interval: "10s",
+			Timeout:  "5s",
 		},
 	}
 
