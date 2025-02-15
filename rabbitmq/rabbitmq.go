@@ -100,9 +100,23 @@ func (*RabbitmqServer) startRabbitmqConsumer() error {
 		return err
 	}
 
+	// Declare a queue for key notifications.
+	queueName := "KEY_QUEUE"
+	_, err = ch.QueueDeclare(
+		queueName, // name of the queue
+		true,      // durable
+		false,     // delete when unused
+		false,     // exclusive
+		false,     // no-wait
+		nil,       // arguments
+	)
+	if err != nil {
+		log.Fatalf("Failed to declare a queue: %v", err)
+		return err
+	}
+
 	// Bind the queue to the exchange with routing key "key.generated".
 	routingKey := "key.get.private.key"
-	queueName := "KEY_QUEUE"
 	err = ch.QueueBind(
 		queueName,    // queue name
 		routingKey,   // routing key
