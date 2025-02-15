@@ -15,3 +15,15 @@ message CreateDonorProfileRequestDto {
 }
 
 message CreateDonorProfileResponseDto { string profileReadableId = 1; }
+
+
+service KeyGrpcService {
+    rpc GetPrivateKey(GetPrivateKeyRequestDto) returns (GetPrivateKeyResponseDto);
+}
+
+message GetPrivateKeyRequestDto {
+  }
+
+message GetPrivateKeyResponseDto {
+    string privateKey = 1;
+  }

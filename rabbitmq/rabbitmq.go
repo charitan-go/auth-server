@@ -5,15 +5,17 @@ import (
 	"log"
 	"os"
 
+	auth "github.com/charitan-go/auth-server/internal/auth/service"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type RabbitmqServer struct {
 	rabbitmqSvc RabbitmqService
+	authSvc     auth.AuthService
 }
 
-func NewRabbitmqServer(rabbitmqSvc RabbitmqService) *RabbitmqServer {
-	return &RabbitmqServer{rabbitmqSvc}
+func NewRabbitmqServer(rabbitmqSvc RabbitmqService, authSvc auth.AuthService) *RabbitmqServer {
+	return &RabbitmqServer{rabbitmqSvc, authSvc}
 }
 
 func (srv *RabbitmqServer) startRabbitmqConsumer() error {
@@ -46,10 +48,12 @@ func (srv *RabbitmqServer) startRabbitmqConsumer() error {
 	go func() {
 		log.Println("Inside the loop to process exchange topics")
 		for d := range msgs {
-			if d.Exchange == "GET_PRIVATE_KEY" {
-				log.Printf("Received message from exchange GET_PRIVATE_KEY: %s\n", d.Body)
-			} else {
-				log.Printf("Received message from exchange %s\n", d.Exchange)
+			switch d.Exchange {
+			case "GET_PRIVATE_KEY":
+				{
+					log.Printf("Received message from exchange GET_PRIVATE_KEY: %s\n", d.Body)
+					srv.authSvc.GetPrivateKey()
+				}
 			}
 		}
 	}()

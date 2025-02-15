@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/charitan-go/auth-server/external/key"
 	"github.com/charitan-go/auth-server/external/profile"
 	"github.com/charitan-go/auth-server/internal/auth/dto"
 	"github.com/charitan-go/auth-server/internal/auth/model"
@@ -17,6 +18,8 @@ import (
 type AuthService interface {
 	Login(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto)
 	RegisterDonor(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto)
+
+	GetPrivateKey() error
 }
 
 type authServiceImpl struct {
@@ -24,6 +27,7 @@ type authServiceImpl struct {
 	jwtService        JwtService
 	r                 repository.AuthRepository
 	profileGrpcClient profile.ProfileGrpcClient
+	keyGrpcClient     key.KeyGrpcClient
 }
 
 func verifyPassword(hashPassword, password string) bool {
@@ -31,8 +35,8 @@ func verifyPassword(hashPassword, password string) bool {
 	return err == nil
 }
 
-func NewAuthService(passwordService PasswordService, jwtService JwtService, r repository.AuthRepository, profileGrpcClient profile.ProfileGrpcClient) AuthService {
-	return &authServiceImpl{passwordService, jwtService, r, profileGrpcClient}
+func NewAuthService(passwordService PasswordService, jwtService JwtService, r repository.AuthRepository, profileGrpcClient profile.ProfileGrpcClient, keyGrpcClient key.KeyGrpcClient) AuthService {
+	return &authServiceImpl{passwordService, jwtService, r, profileGrpcClient, keyGrpcClient}
 }
 
 func (svc *authServiceImpl) RegisterDonor(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto) {
@@ -106,4 +110,27 @@ func (svc *authServiceImpl) Login(req *dto.LoginUserRequestDto) (*dto.LoginUserR
 	}
 
 	return &dto.LoginUserResponseDto{Token: token}, nil
+}
+
+func (svc *authServiceImpl) GetPrivateKey() error {
+	getPrivateKeyRequestDto := &proto.GetPrivateKeyRequestDto{}
+	// createDonorProfileRequestDto := &proto.CreateDonorProfileRequestDto{
+	// 	FirstName: req.FirstName,
+	// 	LastName:  req.LastName,
+	// 	Address:   req.Address,
+	// }
+
+	getPrivateKeyResponseDto, err := svc.keyGrpcClient.GetPrivateKey(getPrivateKeyRequestDto)
+	if err != nil {
+		log.Fatalf("Cannot get private key from key-server: %v\n", err)
+		return err
+	}
+
+	err = svc.jwtService.UpdatePrivateKey(getPrivateKeyResponseDto.PrivateKey)
+	if err != nil {
+		log.Fatalf("Cannot update private key")
+		return err
+	}
+
+	return nil
 }
