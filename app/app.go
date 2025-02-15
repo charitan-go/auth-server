@@ -6,6 +6,7 @@ import (
 	"github.com/charitan-go/auth-server/external/profile"
 	"github.com/charitan-go/auth-server/internal/auth"
 	"github.com/charitan-go/auth-server/pkg/database"
+	"github.com/charitan-go/auth-server/rabbitmq"
 	"github.com/charitan-go/auth-server/rest"
 	"github.com/charitan-go/auth-server/rest/api"
 
@@ -66,12 +67,19 @@ import (
 // }
 
 // Run both servers concurrently
-func runServers(restSrv *rest.RestServer) {
+func runServers(restSrv *rest.RestServer, rabbitmqSrv *rabbitmq.RabbitmqServer) {
 	log.Println("In invoke")
+
 	// Start REST server
 	go func() {
 		log.Println("In goroutine of rest")
 		restSrv.Run()
+	}()
+
+	// Start RabbitMQ server
+	go func() {
+		log.Println("In goroutine of rabbitmq")
+		rabbitmqSrv.Run()
 	}()
 
 	// Start gRPC server
@@ -92,6 +100,7 @@ func Run() {
 			rest.NewRestServer,
 			rest.NewEcho,
 			api.NewApi,
+			rabbitmq.NewRabbitmqServer,
 		),
 		fx.Invoke(runServers),
 	).Run()

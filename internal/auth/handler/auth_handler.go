@@ -52,3 +52,9 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, *res)
 }
+
+func (h *AuthHandler) GetMe(c echo.Context) error {
+
+	// TODO: Implement
+	return c.JSON(http.StatusOK, "fdfds")
+}
