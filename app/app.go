@@ -96,11 +96,11 @@ func Run() {
 	fx.New(
 		auth.AuthModule,
 		profile.ProfileModule,
+		rabbitmq.RabbitmqModule,
 		fx.Provide(
 			rest.NewRestServer,
 			rest.NewEcho,
 			api.NewApi,
-			rabbitmq.NewRabbitmqServer,
 		),
 		fx.Invoke(runServers),
 	).Run()
