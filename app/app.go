@@ -3,6 +3,7 @@ package app
 import (
 	"log"
 
+	"github.com/charitan-go/auth-server/external/key"
 	"github.com/charitan-go/auth-server/external/profile"
 	"github.com/charitan-go/auth-server/internal/auth"
 	"github.com/charitan-go/auth-server/pkg/database"
@@ -96,6 +97,7 @@ func Run() {
 	fx.New(
 		auth.AuthModule,
 		profile.ProfileModule,
+		key.KeyModule,
 		rabbitmq.RabbitmqModule,
 		fx.Provide(
 			rest.NewRestServer,

@@ -1,8 +1,11 @@
 package service
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -13,6 +16,7 @@ import (
 
 type JwtService interface {
 	SignToken(authModel *model.Auth) (string, error)
+	UpdatePrivateKey(privateKeyStr string) error
 }
 
 type jwtServiceImpl struct {
@@ -35,9 +39,6 @@ func NewJwtService() JwtService {
 	// Read config
 	jwtService.readConfig()
 
-	// Gen key pair
-	jwtService.generateRSAKeyPair(2048)
-
 	return jwtService
 }
 
@@ -59,13 +60,6 @@ func (s *jwtServiceImpl) readConfig() {
 	if s.jwtIssuer == "" {
 		s.jwtIssuer = "charitan-go"
 	}
-}
-
-func (s *jwtServiceImpl) generateRSAKeyPair(bits int) {
-	// TODO: Impl
-	privateKey, _ := rsa.GenerateKey(rand.Reader, bits)
-	s.privateKey = privateKey
-	s.publicKey = &(privateKey.PublicKey)
 }
 
 func (s *jwtServiceImpl) SignToken(authModel *model.Auth) (string, error) {
@@ -92,4 +86,48 @@ func (s *jwtServiceImpl) SignToken(authModel *model.Auth) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func (s *jwtServiceImpl) UpdatePrivateKey(keyStr string) error {
+	// Decode the PEM block from the string.
+	block, _ := pem.Decode([]byte(keyStr))
+	if block == nil {
+		return errors.New("failed to decode PEM block containing the key")
+	}
+
+	var rsaKey *rsa.PrivateKey
+	var err error
+
+	switch block.Type {
+	case "RSA PRIVATE KEY":
+		// Parse the key in PKCS#1 format.
+		rsaKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			return err
+		}
+	case "PRIVATE KEY":
+		// Parse the key in PKCS#8 format.
+		var key interface{}
+		key, err = x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return err
+		}
+		var ok bool
+		rsaKey, ok = key.(*rsa.PrivateKey)
+		if !ok {
+			return errors.New("parsed key is not an RSA private key")
+		}
+	default:
+		return fmt.Errorf("unsupported key type %q", block.Type)
+	}
+
+	// Verify that the RSA key is 2048 bits in size.
+	// if rsaKey.N.BitLen() != 2048 {
+	// 	return nil, errors.New("the RSA key is not 2048 bits")
+	// }
+
+	s.privateKey = rsaKey
+
+	return nil
+
 }
