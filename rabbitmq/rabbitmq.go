@@ -16,6 +16,7 @@ func NewRabbitmqServer(rabbitmqSvc RabbitmqService, authSvc auth.AuthService) *R
 
 func (srv *RabbitmqServer) startRabbitmqConsumer() error {
 	ch, err := srv.rabbitmqSvc.ConnectRabbitmq()
+	defer ch.Close()
 	if err != nil {
 		log.Fatalf("Failed to open a channel: %v", err)
 		return err

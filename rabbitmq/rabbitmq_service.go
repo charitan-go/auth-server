@@ -43,7 +43,7 @@ func (*rabbitmqServiceImpl) ConnectRabbitmq() (*amqp.Channel, error) {
 		log.Fatalf("Failed to open a channel: %v", err)
 		return nil, err
 	}
-	defer ch.Close()
+	// defer ch.Close()
 
 	return ch, nil
 }
