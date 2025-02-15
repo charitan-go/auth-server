@@ -19,6 +19,7 @@ func NewRabbitmqServer(rabbitmqSvc RabbitmqService, authSvc auth.AuthService) *R
 }
 
 func (srv *RabbitmqServer) startRabbitmqConsumer() error {
+	// ch, err := srv.rabbitmqSvc.ConnectRabbitmq()
 	log.Println("In function startRabbitmqConsumer")
 
 	amqpConnectionStr := fmt.Sprintf("amqp://%s:%s@message-broker:5672",

@@ -24,29 +24,16 @@ func (srv *RabbitmqServer) setupGetPrivateKeyConsumer(ch *amqp.Channel) (<-chan 
 	}
 
 	// Bind the queue to the exchange with routing key "key.generated".
+	// srv.rabbitmqSvc.
 	routingKey := "key.get.private.key"
-	err = ch.QueueBind(
-		"",           // queue name
-		routingKey,   // routing key
-		exchangeName, // exchange
-		false,        // no-wait
-		nil,          // arguments
-	)
+	err = srv.rabbitmqSvc.QueueBind(ch, queueName, routingKey, exchangeName)
 	if err != nil {
-		log.Fatalf("Failed to bind queue: %v", err)
+		log.Fatalf("Failed to declare a queue: %v", err)
 		return nil, err
 	}
 
 	// Consume messages from the queue.
-	msgs, err := ch.Consume(
-		queueName, // queue name
-		"",        // consumer tag
-		true,      // auto-acknowledge
-		false,     // exclusive
-		false,     // no-local
-		false,     // no-wait
-		nil,       // arguments
-	)
+	msgs, err := srv.rabbitmqSvc.Consume(ch, queueName)
 	if err != nil {
 		log.Fatalf("Failed to register a consumer: %v", err)
 		return nil, err
