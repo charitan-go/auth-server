@@ -53,7 +53,7 @@ func (srv *RabbitmqServer) startRabbitmqConsumer() error {
 			case "GET_PRIVATE_KEY":
 				{
 					log.Printf("Received message from exchange GET_PRIVATE_KEY: %s\n", d.Body)
-					srv.authSvc.GetPrivateKey()
+					srv.authSvc.HandleGetPrivateKeyRabbitmq()
 				}
 			}
 		}

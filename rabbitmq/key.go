@@ -8,7 +8,7 @@ import (
 
 func (srv *RabbitmqServer) setupGetPrivateKeyConsumer(ch *amqp.Channel) (<-chan amqp.Delivery, error) {
 	// Declare exchange name for private key
-	exchangeName := "GET_PRIVATE_KEY"
+	exchangeName := "key.exchange"
 	err := srv.rabbitmqSvc.DeclareExchange(ch, exchangeName)
 	if err != nil {
 		log.Fatalf("Failed to declare an exchange: %v", err)
@@ -16,7 +16,7 @@ func (srv *RabbitmqServer) setupGetPrivateKeyConsumer(ch *amqp.Channel) (<-chan 
 	}
 
 	// Declare a queue for key notifications.amqp
-	queueName := "KEY_QUEUE"
+	queueName := "auth.private_key.queue"
 	err = srv.rabbitmqSvc.DeclareQueue(ch, queueName)
 	if err != nil {
 		log.Fatalf("Failed to declare a queue: %v", err)
@@ -25,7 +25,7 @@ func (srv *RabbitmqServer) setupGetPrivateKeyConsumer(ch *amqp.Channel) (<-chan 
 
 	// Bind the queue to the exchange with routing key "key.generated".
 	// srv.rabbitmqSvc.
-	routingKey := "key.get.private.key"
+	routingKey := "key.get_private_key"
 	err = srv.rabbitmqSvc.QueueBind(ch, queueName, routingKey, exchangeName)
 	if err != nil {
 		log.Fatalf("Failed to declare a queue: %v", err)
