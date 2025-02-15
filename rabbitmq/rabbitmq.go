@@ -1,8 +1,12 @@
 package rabbitmq
 
 import (
-	auth "github.com/charitan-go/auth-server/internal/auth/service"
+	"fmt"
 	"log"
+	"os"
+
+	auth "github.com/charitan-go/auth-server/internal/auth/service"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type RabbitmqServer struct {
@@ -15,12 +19,25 @@ func NewRabbitmqServer(rabbitmqSvc RabbitmqService, authSvc auth.AuthService) *R
 }
 
 func (srv *RabbitmqServer) startRabbitmqConsumer() error {
-	ch, err := srv.rabbitmqSvc.ConnectRabbitmq()
-	defer ch.Close()
+	// ch, err := srv.rabbitmqSvc.ConnectRabbitmq()
+	log.Println("In function startRabbitmqConsumer")
+
+	amqpConnectionStr := fmt.Sprintf("amqp://%s:%s@message-broker:5672",
+		os.Getenv("MESSAGE_BROKER_USER"),
+		os.Getenv("MESSAGE_BROKER_PASSWORD"))
+	conn, err := amqp.Dial(amqpConnectionStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+		return err
+	}
+	defer conn.Close()
+
+	ch, err := conn.Channel()
 	if err != nil {
 		log.Fatalf("Failed to open a channel: %v", err)
 		return err
 	}
+	defer ch.Close()
 
 	msgs, err := srv.setupGetPrivateKeyConsumer(ch)
 	if err != nil {
