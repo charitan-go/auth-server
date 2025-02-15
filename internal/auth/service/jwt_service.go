@@ -121,11 +121,6 @@ func (s *jwtServiceImpl) UpdatePrivateKey(keyStr string) error {
 		return fmt.Errorf("unsupported key type %q", block.Type)
 	}
 
-	// Verify that the RSA key is 2048 bits in size.
-	// if rsaKey.N.BitLen() != 2048 {
-	// 	return nil, errors.New("the RSA key is not 2048 bits")
-	// }
-
 	s.privateKey = rsaKey
 
 	return nil
