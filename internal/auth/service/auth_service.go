@@ -11,13 +11,16 @@ import (
 	"github.com/charitan-go/auth-server/internal/auth/model"
 	"github.com/charitan-go/auth-server/internal/auth/repository"
 	"github.com/charitan-go/auth-server/pkg/proto"
+	restpkg "github.com/charitan-go/auth-server/pkg/rest"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService interface {
-	Login(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto)
-	RegisterDonor(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto)
+	HandleLoginRest(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto)
+	HandleRegisterDonorRest(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto)
+
+	HandleGetMeRest(jwtPayload *restpkg.JwtPayload) (*dto.GetMeResponseDto, *dto.ErrorResponseDto)
 
 	HandleGetPrivateKeyRabbitmq() error
 }
@@ -39,7 +42,7 @@ func NewAuthService(passwordService PasswordService, jwtService JwtService, r re
 	return &authServiceImpl{passwordService, jwtService, r, profileGrpcClient, keyGrpcClient}
 }
 
-func (svc *authServiceImpl) RegisterDonor(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto) {
+func (svc *authServiceImpl) HandleRegisterDonorRest(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto) {
 	// Check does email existed
 	existedEmailDonor, _ := svc.r.FindOneByEmail(req.Email)
 
@@ -91,7 +94,7 @@ func (svc *authServiceImpl) RegisterDonor(req *dto.RegisterDonorRequestDto) (*dt
 }
 
 // LoginUser implements AuthService.
-func (svc *authServiceImpl) Login(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto) {
+func (svc *authServiceImpl) HandleLoginRest(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto) {
 	// Check user existed or not
 	existedUser, err := svc.r.FindOneByEmail(req.Email)
 	if err != nil {
@@ -112,13 +115,55 @@ func (svc *authServiceImpl) Login(req *dto.LoginUserRequestDto) (*dto.LoginUserR
 	return &dto.LoginUserResponseDto{Token: token}, nil
 }
 
+// GetMe implements AuthService.
+func (svc *authServiceImpl) HandleGetMeRest(jwtPayload *restpkg.JwtPayload) (*dto.GetMeResponseDto, *dto.ErrorResponseDto) {
+	// Search profileId by userId
+	existedUser, err := svc.r.FindOneByReadableId(jwtPayload.ReadableId)
+	if err != nil {
+		return nil, &dto.ErrorResponseDto{StatusCode: http.StatusUnauthorized, Message: "User not found"}
+	}
+
+	// Invalid user role
+	if existedUser.Role != dto.RoleEnum(jwtPayload.Role) {
+		return nil, &dto.ErrorResponseDto{StatusCode: http.StatusForbidden, Message: "Invalid token"}
+	}
+
+	// Get profile based from role
+	resDto := &dto.GetMeResponseDto{
+		ProfileReadableId: existedUser.ProfileReadableId.String(),
+		Email:             existedUser.Email,
+		Role:              string(existedUser.Role),
+	}
+
+	switch existedUser.Role {
+	case dto.RoleDonor:
+		{
+			getDonorProfileRequestDto := &proto.GetDonorProfileRequestDto{
+				ProfileReadableId: existedUser.ProfileReadableId.String(),
+			}
+			getDonorProfileResponseDto, err := svc.profileGrpcClient.GetDonorProfile(getDonorProfileRequestDto)
+			if err != nil {
+				return nil, &dto.ErrorResponseDto{StatusCode: http.StatusInternalServerError, Message: "Internal server error"}
+			}
+
+			resDto.DonorDetails = &dto.GetMeDonorDetailsResponseDto{
+				FirstName: getDonorProfileResponseDto.FirstName,
+				LastName:  getDonorProfileResponseDto.LastName,
+				Address:   getDonorProfileResponseDto.Address,
+			}
+		}
+	case dto.RoleCharity:
+		{
+			// TODO: Add for role charity
+
+		}
+	}
+
+	return resDto, nil
+}
+
 func (svc *authServiceImpl) HandleGetPrivateKeyRabbitmq() error {
 	getPrivateKeyRequestDto := &proto.GetPrivateKeyRequestDto{}
-	// createDonorProfileRequestDto := &proto.CreateDonorProfileRequestDto{
-	// 	FirstName: req.FirstName,
-	// 	LastName:  req.LastName,
-	// 	Address:   req.Address,
-	// }
 
 	getPrivateKeyResponseDto, err := svc.keyGrpcClient.GetPrivateKey(getPrivateKeyRequestDto)
 	if err != nil {

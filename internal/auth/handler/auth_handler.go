@@ -30,7 +30,7 @@ func (h *AuthHandler) RegisterDonor(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponseDto{Message: "Invalid request bodyy", StatusCode: http.StatusBadRequest})
 	}
 
-	res, errRes := h.svc.RegisterDonor(req)
+	res, errRes := h.svc.HandleRegisterDonorRest(req)
 	if errRes != nil {
 		return c.JSON(int(errRes.StatusCode), *errRes)
 	}
@@ -46,7 +46,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponseDto{Message: "Invalid request body"})
 	}
 
-	res, errRes := h.svc.Login(&req)
+	res, errRes := h.svc.HandleLoginRest(&req)
 	if errRes != nil {
 		return c.JSON(int(errRes.StatusCode), *errRes)
 	}
@@ -64,6 +64,11 @@ func (h *AuthHandler) GetMe(c echo.Context) error {
 
 	log.Println("User id is " + jwtPayload.ReadableId)
 
+	res, errRes := h.svc.HandleGetMeRest(jwtPayload)
+	if errRes != nil {
+		return c.JSON(int(errRes.StatusCode), *errRes)
+	}
+
 	// TODO: Implement
-	return c.JSON(http.StatusOK, "fdfds")
+	return c.JSON(http.StatusOK, res)
 }
