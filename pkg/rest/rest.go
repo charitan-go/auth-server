@@ -6,12 +6,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type HeaderPayload struct {
+type JwtPayload struct {
 	ReadableId string
 	Role       string
 }
 
-func GetHeaderPayload(c echo.Context) (*HeaderPayload, error) {
+func GetJwtPayload(c echo.Context) (*JwtPayload, error) {
 	readableId := c.Request().Header.Get("X-User-Id")
 	role := c.Request().Header.Get("X-User-Role")
 
@@ -19,6 +19,5 @@ func GetHeaderPayload(c echo.Context) (*HeaderPayload, error) {
 		return nil, errors.New("Miss info of header payload")
 	}
 
-	return &HeaderPayload{ReadableId: readableId, Role: role}, nil
+	return &JwtPayload{ReadableId: readableId, Role: role}, nil
 }
-
