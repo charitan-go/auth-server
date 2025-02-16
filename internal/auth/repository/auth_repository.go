@@ -53,7 +53,7 @@ func (r *authRepositoryImpl) FindOneByEmail(email string) (*model.Auth, error) {
 func (r *authRepositoryImpl) FindOneByReadableId(readableId string) (*model.Auth, error) {
 	var auth model.Auth
 
-	result := r.db.Where("readableId = ?", readableId).First(&auth)
+	result := r.db.Where("readable_id = ?", readableId).First(&auth)
 	if result.Error != nil {
 		return nil, result.Error
 	}
