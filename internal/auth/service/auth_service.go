@@ -19,7 +19,7 @@ type AuthService interface {
 	Login(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto)
 	RegisterDonor(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto)
 
-	GetPrivateKey() error
+	HandleGetPrivateKeyRabbitmq() error
 }
 
 type authServiceImpl struct {
@@ -112,7 +112,7 @@ func (svc *authServiceImpl) Login(req *dto.LoginUserRequestDto) (*dto.LoginUserR
 	return &dto.LoginUserResponseDto{Token: token}, nil
 }
 
-func (svc *authServiceImpl) GetPrivateKey() error {
+func (svc *authServiceImpl) HandleGetPrivateKeyRabbitmq() error {
 	getPrivateKeyRequestDto := &proto.GetPrivateKeyRequestDto{}
 	// createDonorProfileRequestDto := &proto.CreateDonorProfileRequestDto{
 	// 	FirstName: req.FirstName,
