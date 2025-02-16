@@ -50,7 +50,7 @@ func (srv *RabbitmqServer) startRabbitmqConsumer() error {
 		log.Println("Inside the loop to process exchange topics")
 		for d := range msgs {
 			switch d.Exchange {
-			case "GET_PRIVATE_KEY":
+			case KEY_EXCHANGE_NAME:
 				{
 					log.Printf("Received message from exchange GET_PRIVATE_KEY: %s\n", d.Body)
 					srv.authSvc.HandleGetPrivateKeyRabbitmq()
