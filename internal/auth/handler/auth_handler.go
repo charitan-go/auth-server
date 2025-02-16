@@ -55,8 +55,13 @@ func (h *AuthHandler) Login(c echo.Context) error {
 }
 
 func (h *AuthHandler) GetMe(c echo.Context) error {
+	for name, values := range c.Request().Header {
+		log.Printf("Header %s: %v", name, values)
+	}
+
 	headerPayload, err := restpkg.GetHeaderPayload(c)
 	if err == nil {
+		log.Fatalln("Not found header payload")
 		return c.JSON(http.StatusNonAuthoritativeInfo, dto.ErrorResponseDto{Message: "Not authorized"})
 	}
 
