@@ -6,6 +6,7 @@ import (
 
 	"github.com/charitan-go/auth-server/internal/auth/dto"
 	"github.com/charitan-go/auth-server/internal/auth/service"
+	restpkg "github.com/charitan-go/auth-server/pkg/rest"
 	"github.com/labstack/echo/v4"
 )
 
@@ -54,6 +55,12 @@ func (h *AuthHandler) Login(c echo.Context) error {
 }
 
 func (h *AuthHandler) GetMe(c echo.Context) error {
+	headerPayload, err := restpkg.GetHeaderPayload(c)
+	if err == nil {
+		return c.JSON(http.StatusNonAuthoritativeInfo, dto.ErrorResponseDto{Message: "Not authorized"})
+	}
+
+	log.Println("User id is " + headerPayload.ReadableId)
 
 	// TODO: Implement
 	return c.JSON(http.StatusOK, "fdfds")
