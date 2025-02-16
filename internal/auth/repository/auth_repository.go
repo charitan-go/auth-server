@@ -1,15 +1,17 @@
 package repository
 
 import (
-  "log"
 	"github.com/charitan-go/auth-server/internal/auth/model"
 	"github.com/charitan-go/auth-server/pkg/database"
 	"gorm.io/gorm"
+	"log"
 )
 
 type AuthRepository interface {
-	FindOneByEmail(email string) (*model.Auth, error)
 	Save(authModel *model.Auth) (*model.Auth, error)
+
+	FindOneByEmail(email string) (*model.Auth, error)
+	FindOneByReadableId(readableId string) (*model.Auth, error)
 }
 
 type authRepositoryImpl struct {
@@ -27,6 +29,15 @@ func NewAuthRepository() AuthRepository {
 	return &authRepositoryImpl{db: database.DB}
 }
 
+func (r *authRepositoryImpl) Save(authModel *model.Auth) (*model.Auth, error) {
+	result := r.db.Create(authModel)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return authModel, nil
+}
+
 func (r *authRepositoryImpl) FindOneByEmail(email string) (*model.Auth, error) {
 	var auth model.Auth
 
@@ -38,11 +49,14 @@ func (r *authRepositoryImpl) FindOneByEmail(email string) (*model.Auth, error) {
 	return &auth, nil
 }
 
-func (r *authRepositoryImpl) Save(authModel *model.Auth) (*model.Auth, error) {
-	result := r.db.Create(authModel)
+// FindOneByReadableId implements AuthRepository.
+func (r *authRepositoryImpl) FindOneByReadableId(readableId string) (*model.Auth, error) {
+	var auth model.Auth
+
+	result := r.db.Where("readable_id = ?", readableId).First(&auth)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return authModel, nil
+	return &auth, nil
 }

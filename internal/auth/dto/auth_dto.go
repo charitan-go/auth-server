@@ -28,6 +28,26 @@ type LoginUserResponseDto struct {
 	Token string `json:"token"`
 }
 
+type GetMeResponseDto struct {
+	ProfileReadableId string `json:"profileReadableIdId"`
+	Email             string `json:"email"`
+	Role              string `json:"role"`
+
+	DonorDetails   *GetMeDonorDetailsResponseDto   `json:"donorDetails,omitempty"`
+	CharityDetails *GetMeCharityDetailsResponseDto `json:"charityDetails,omitempty"`
+}
+
+type GetMeDonorDetailsResponseDto struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Address   string `json:"address"`
+}
+
+type GetMeCharityDetailsResponseDto struct {
+	OrganizationName string `json:"organizationName"`
+	TaxCode          string `json:"taxCode"`
+}
+
 type MessageResponseDto struct {
 	Message string `json:"message"`
 }
