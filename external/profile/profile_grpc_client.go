@@ -16,6 +16,8 @@ const PROFILE_GRPC_SERVICE_NAME = "profile-server-grpc"
 type ProfileGrpcClient interface {
 	CreateDonorProfile(reqDto *proto.CreateDonorProfileRequestDto) (*proto.CreateDonorProfileResponseDto, error)
 
+	CreateCharityProfile(reqDto *proto.CreateCharityProfileRequestDto) (*proto.CreateCharityProfileResponseDto, error)
+
 	GetDonorProfile(reqDto *proto.GetDonorProfileRequestDto) (*proto.GetDonorProfileResponseDto, error)
 }
 
@@ -57,6 +59,31 @@ func (c *profileProtoClientImpl) CreateDonorProfile(reqDto *proto.CreateDonorPro
 	responseDto, err := client.CreateDonorProfile(ctx, reqDto)
 	if err != nil {
 		return nil, fmt.Errorf("CreateDonorProfile failed: %v", err)
+	}
+
+	return responseDto, nil
+}
+
+// CreateCharityProfile implements ProfileGrpcClient.
+func (c *profileProtoClientImpl) CreateCharityProfile(reqDto *proto.CreateCharityProfileRequestDto) (*proto.CreateCharityProfileResponseDto, error) {
+	profileServerAddress := discovery.DiscoverService(PROFILE_GRPC_SERVICE_NAME)
+
+	// Connect to the gRPC server
+	conn, err := grpc.NewClient(profileServerAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, fmt.Errorf("connection failed: %v", err)
+	}
+	defer conn.Close()
+
+	// Create a client
+	client := proto.NewProfileGrpcServiceClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	responseDto, err := client.CreateCharityProfile(ctx, reqDto)
+	if err != nil {
+		return nil, fmt.Errorf("CreateCharityProfile failed: %v", err)
 	}
 
 	return responseDto, nil

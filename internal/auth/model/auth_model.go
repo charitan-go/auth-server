@@ -31,7 +31,16 @@ func (a *Auth) BeforeCreate(db *gorm.DB) (err error) {
 	return nil
 }
 
-func NewAuth(req *dto.RegisterDonorRequestDto, hashedPassword string, role dto.RoleEnum, profileReableId uuid.UUID) *Auth {
+func NewDonorAuth(req *dto.RegisterDonorRequestDto, hashedPassword string, role dto.RoleEnum, profileReableId uuid.UUID) *Auth {
+	return &Auth{
+		Email:             req.Email,
+		HashedPassword:    hashedPassword,
+		Role:              role,
+		ProfileReadableId: profileReableId,
+	}
+}
+
+func NewCharityAuth(req *dto.RegisterCharityRequestDto, hashedPassword string, role dto.RoleEnum, profileReableId uuid.UUID) *Auth {
 	return &Auth{
 		Email:             req.Email,
 		HashedPassword:    hashedPassword,

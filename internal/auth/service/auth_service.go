@@ -80,7 +80,7 @@ func (svc *authServiceImpl) HandleRegisterDonorRest(req *dto.RegisterDonorReques
 	}
 
 	// Save to repo
-	authModel := model.NewAuth(
+	authModel := model.NewDonorAuth(
 		req,
 		hashedPassword,
 		dto.RoleDonor,
@@ -104,13 +104,15 @@ func (svc *authServiceImpl) HandleRegisterCharityRest(req *dto.RegisterCharityRe
 	}
 
 	// Create proto request
-	createDonorProfileRequestDto := &proto.CreateDonorProfileRequestDto{
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
-		Address:   req.Address,
+	createCharityProfileRequestDto := &proto.CreateCharityProfileRequestDto{
+		// FirstName: req.FirstName,
+		// LastName:  req.LastName,
+		OrganizationName: req.OrganizationName,
+		TaxCode:          req.TaxCode,
+		Address:          req.Address,
 	}
-	// createDonorProfileResponseDto, err := protoclient.ProfileClient.CreateDonorProfile(*protoclient.ProfileCtx, createDonorProfile)
-	createDonorProfileResponseDto, err := svc.profileGrpcClient.CreateDonorProfile(createDonorProfileRequestDto)
+	// createCharityProfileResponseDto, err := protoclient.ProfileClient.CreateCharityProfile(*protoclient.ProfileCtx, createCharityProfile)
+	createCharityProfileResponseDto, err := svc.profileGrpcClient.CreateCharityProfile(createCharityProfileRequestDto)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Cannot send to profile-server: %v\n", err)
 		log.Fatalln(errorMessage)
@@ -118,7 +120,7 @@ func (svc *authServiceImpl) HandleRegisterCharityRest(req *dto.RegisterCharityRe
 	}
 
 	// Parse profileId
-	profileReadableIdStr := createDonorProfileResponseDto.GetProfileReadableId()
+	profileReadableIdStr := createCharityProfileResponseDto.GetProfileReadableId()
 	profileReadableId, err := uuid.Parse(profileReadableIdStr)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Cannot parse profileReadableId: %v", err)
@@ -133,10 +135,10 @@ func (svc *authServiceImpl) HandleRegisterCharityRest(req *dto.RegisterCharityRe
 	}
 
 	// Save to repo
-	authModel := model.NewAuth(
+	authModel := model.NewCharityAuth(
 		req,
 		hashedPassword,
-		dto.RoleDonor,
+		dto.RoleCharity,
 		profileReadableId)
 	_, err = svc.r.Save(authModel)
 	if err != nil {
