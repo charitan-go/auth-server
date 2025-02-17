@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/charitan-go/auth-server/rabbitmq"
+	rabbitmqservice "github.com/charitan-go/auth-server/rabbitmq/service"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -21,10 +21,10 @@ type EmailRabbitmqProducer interface {
 }
 
 type emailRabbitmqProducerImpl struct {
-	rabbitmqSvc rabbitmq.RabbitmqService
+	rabbitmqSvc rabbitmqservice.RabbitmqService
 }
 
-func NewEmailRabbitmqProducer(rabbitmqSvc rabbitmq.RabbitmqService) EmailRabbitmqProducer {
+func NewEmailRabbitmqProducer(rabbitmqSvc rabbitmqservice.RabbitmqService) EmailRabbitmqProducer {
 	return &emailRabbitmqProducerImpl{rabbitmqSvc}
 }
 

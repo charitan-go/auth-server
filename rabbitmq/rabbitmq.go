@@ -6,15 +6,16 @@ import (
 	"os"
 
 	auth "github.com/charitan-go/auth-server/internal/auth/service"
+	rabbitmqservice "github.com/charitan-go/auth-server/rabbitmq/service"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type RabbitmqServer struct {
-	rabbitmqSvc RabbitmqService
+	rabbitmqSvc rabbitmqservice.RabbitmqService
 	authSvc     auth.AuthService
 }
 
-func NewRabbitmqServer(rabbitmqSvc RabbitmqService, authSvc auth.AuthService) *RabbitmqServer {
+func NewRabbitmqServer(rabbitmqSvc rabbitmqservice.RabbitmqService, authSvc auth.AuthService) *RabbitmqServer {
 	return &RabbitmqServer{rabbitmqSvc, authSvc}
 }
 
