@@ -109,6 +109,12 @@ func (svc *authServiceImpl) HandleRegisterDonorRest(req *dto.RegisterDonorReques
 		return nil, &dto.ErrorResponseDto{Message: "Failed to save to database", StatusCode: http.StatusInternalServerError}
 	}
 
+	// Send email confirm
+	svc.emailRabbitmqProducer.NotiSendRegisterAccountEmail(&email.SendRegisterAccountEmailRequestDto{
+		Email: authModel.Email,
+		Role:  string(authModel.Role),
+	})
+
 	// Return response
 	return &dto.RegisterResponseDto{Message: "Register successfully"}, nil
 }
