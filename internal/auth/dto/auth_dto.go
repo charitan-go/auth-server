@@ -15,6 +15,14 @@ type RegisterDonorRequestDto struct {
 	Address   string `json:"address"`
 }
 
+type RegisterCharityRequestDto struct {
+	OrganizationName string `json:"organizationName"`
+	TaxCode          string `json:"taxCode"`
+	Email            string `json:"email"`
+	Password         string `json:"password"`
+	Address          string `json:"address"`
+}
+
 type RegisterResponseDto struct {
 	Message string `json:"message"`
 }

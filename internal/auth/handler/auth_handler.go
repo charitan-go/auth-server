@@ -38,6 +38,22 @@ func (h *AuthHandler) RegisterDonor(c echo.Context) error {
 	return c.JSON(http.StatusCreated, *res)
 }
 
+func (h *AuthHandler) RegisterCharity(c echo.Context) error {
+
+	req := new(dto.RegisterCharityRequestDto)
+	if err := c.Bind(req); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, dto.ErrorResponseDto{Message: "Invalid request bodyy", StatusCode: http.StatusBadRequest})
+	}
+
+	res, errRes := h.svc.HandleRegisterCharityRest(req)
+	if errRes != nil {
+		return c.JSON(int(errRes.StatusCode), *errRes)
+	}
+
+	return c.JSON(http.StatusCreated, *res)
+}
+
 func (h *AuthHandler) Login(c echo.Context) error {
 	var req dto.LoginUserRequestDto
 
