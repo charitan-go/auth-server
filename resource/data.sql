@@ -38,3 +38,16 @@ VALUES
     ('donor28@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'DONOR', '6410dd2d-9b86-4b8c-a44d-f32049ce2fef'),
     ('donor29@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'DONOR', '66180a74-0bfb-4747-99dd-95d9cdaf8da1'),
     ('donor30@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'DONOR', 'd51aa6cb-a471-45f8-aa15-34924a3f5c95');
+
+
+-- Insert charity organization accounts into the auths table
+INSERT INTO auths (email, hashed_password, role, profile_readable_id)
+VALUES 
+    ('charity1@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', 'a364e55f-2b2d-4180-b29c-c1385cb3c27e'),
+    ('charity2@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '209eddd5-561f-4605-9103-07ed9f8e36b2'),
+    ('charity3@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '713a7a9f-457f-4159-bb9e-b9835f9313f3'),
+    ('charity4@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '6c648bad-4036-4240-9685-199eb7c4e164'),
+    ('charity5@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '87e36b91-1047-4b3a-ab30-617b03df537a'),
+    ('charity6@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '3c1e982f-bb78-42c9-8829-690f5ee842ed');
+
+

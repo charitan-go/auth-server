@@ -19,6 +19,7 @@ import (
 type AuthService interface {
 	HandleLoginRest(req *dto.LoginUserRequestDto) (*dto.LoginUserResponseDto, *dto.ErrorResponseDto)
 	HandleRegisterDonorRest(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto)
+	HandleRegisterCharityRest(req *dto.RegisterCharityRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto)
 
 	HandleGetMeRest(jwtPayload *restpkg.JwtPayload) (*dto.GetMeResponseDto, *dto.ErrorResponseDto)
 
@@ -79,10 +80,65 @@ func (svc *authServiceImpl) HandleRegisterDonorRest(req *dto.RegisterDonorReques
 	}
 
 	// Save to repo
-	authModel := model.NewAuth(
+	authModel := model.NewDonorAuth(
 		req,
 		hashedPassword,
 		dto.RoleDonor,
+		profileReadableId)
+	_, err = svc.r.Save(authModel)
+	if err != nil {
+		return nil, &dto.ErrorResponseDto{Message: "Failed to save to database", StatusCode: http.StatusInternalServerError}
+	}
+
+	// Return response
+	return &dto.RegisterResponseDto{Message: "Register successfully"}, nil
+}
+
+// HandleRegisterCharityRest implements AuthService.
+func (svc *authServiceImpl) HandleRegisterCharityRest(req *dto.RegisterCharityRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto) {
+	// Check does email existed
+	existedEmailCharity, _ := svc.r.FindOneByEmail(req.Email)
+
+	if existedEmailCharity != nil {
+		return nil, &dto.ErrorResponseDto{Message: "Email already existed", StatusCode: http.StatusBadRequest}
+	}
+
+	// Create proto request
+	createCharityProfileRequestDto := &proto.CreateCharityProfileRequestDto{
+		// FirstName: req.FirstName,
+		// LastName:  req.LastName,
+		OrganizationName: req.OrganizationName,
+		TaxCode:          req.TaxCode,
+		Address:          req.Address,
+	}
+	// createCharityProfileResponseDto, err := protoclient.ProfileClient.CreateCharityProfile(*protoclient.ProfileCtx, createCharityProfile)
+	createCharityProfileResponseDto, err := svc.profileGrpcClient.CreateCharityProfile(createCharityProfileRequestDto)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Cannot send to profile-server: %v\n", err)
+		log.Fatalln(errorMessage)
+		return nil, &dto.ErrorResponseDto{Message: errorMessage, StatusCode: http.StatusInternalServerError}
+	}
+
+	// Parse profileId
+	profileReadableIdStr := createCharityProfileResponseDto.GetProfileReadableId()
+	profileReadableId, err := uuid.Parse(profileReadableIdStr)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Cannot parse profileReadableId: %v", err)
+		log.Fatalln(errorMessage)
+		return nil, &dto.ErrorResponseDto{Message: errorMessage, StatusCode: http.StatusInternalServerError}
+	}
+
+	// Hash password
+	hashedPassword, err := svc.passwordService.HashPassword(req.Password)
+	if err != nil {
+		return nil, &dto.ErrorResponseDto{Message: "Error in hashedPassword", StatusCode: http.StatusInternalServerError}
+	}
+
+	// Save to repo
+	authModel := model.NewCharityAuth(
+		req,
+		hashedPassword,
+		dto.RoleCharity,
 		profileReadableId)
 	_, err = svc.r.Save(authModel)
 	if err != nil {
@@ -155,7 +211,20 @@ func (svc *authServiceImpl) HandleGetMeRest(jwtPayload *restpkg.JwtPayload) (*dt
 	case dto.RoleCharity:
 		{
 			// TODO: Add for role charity
+			getCharityProfileRequestDto := &proto.GetCharityProfileRequestDto{
+				ProfileReadableId: existedUser.ProfileReadableId.String(),
+			}
+			getCharityProfileResponseDto, err := svc.profileGrpcClient.GetCharityProfile(getCharityProfileRequestDto)
+			if err != nil {
+				log.Fatalf("Error in send grpc: %v\n", err)
+				return nil, &dto.ErrorResponseDto{StatusCode: http.StatusInternalServerError, Message: "Internal server error"}
+			}
 
+			resDto.CharityDetails = &dto.GetMeCharityDetailsResponseDto{
+				OrganizationName: getCharityProfileResponseDto.OrganizationName,
+				TaxCode:          getCharityProfileResponseDto.TaxCode,
+				Address:          getCharityProfileResponseDto.Address,
+			}
 		}
 	}
 

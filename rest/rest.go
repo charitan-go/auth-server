@@ -34,6 +34,7 @@ func (s *RestServer) setupRouting() {
 	// Non auth endpoint
 	s.echo.POST("/login", s.api.AuthHandler.Login)
 	s.echo.POST("/donor/register", s.api.AuthHandler.RegisterDonor)
+	s.echo.POST("/charity/register", s.api.AuthHandler.RegisterCharity)
 
 	// Endpoint for all users (registricted)
 	s.echo.GET("/me", s.api.AuthHandler.GetMe)
