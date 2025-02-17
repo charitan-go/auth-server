@@ -211,7 +211,20 @@ func (svc *authServiceImpl) HandleGetMeRest(jwtPayload *restpkg.JwtPayload) (*dt
 	case dto.RoleCharity:
 		{
 			// TODO: Add for role charity
+			getCharityProfileRequestDto := &proto.GetCharityProfileRequestDto{
+				ProfileReadableId: existedUser.ProfileReadableId.String(),
+			}
+			getCharityProfileResponseDto, err := svc.profileGrpcClient.GetCharityProfile(getCharityProfileRequestDto)
+			if err != nil {
+				log.Fatalf("Error in send grpc: %v\n", err)
+				return nil, &dto.ErrorResponseDto{StatusCode: http.StatusInternalServerError, Message: "Internal server error"}
+			}
 
+			resDto.CharityDetails = &dto.GetMeCharityDetailsResponseDto{
+				OrganizationName: getCharityProfileResponseDto.OrganizationName,
+				TaxCode:          getCharityProfileResponseDto.TaxCode,
+				Address:          getCharityProfileResponseDto.Address,
+			}
 		}
 	}
 

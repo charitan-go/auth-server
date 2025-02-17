@@ -54,6 +54,7 @@ type GetMeDonorDetailsResponseDto struct {
 type GetMeCharityDetailsResponseDto struct {
 	OrganizationName string `json:"organizationName"`
 	TaxCode          string `json:"taxCode"`
+	Address          string `json:"address"`
 }
 
 type MessageResponseDto struct {
