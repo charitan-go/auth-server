@@ -11,13 +11,15 @@ import (
 )
 
 var (
-	EMAIL_EXCHANGE_NAME          = "email.exchange"
-	EMAIL_AUTH_QUEUE_NAME        = "email.auth.queue"
-	REGISTER_ACCOUNT_ROUTING_KEY = "email.auth.register_account"
+	EMAIL_EXCHANGE_NAME   = "email.exchange"
+	EMAIL_AUTH_QUEUE_NAME = "email.auth.queue"
+
+	REGISTER_DONOR_ACCOUNT_ROUTING_KEY   = "email.auth.donor.register_account"
+	REGISTER_CHARITY_ACCOUNT_ROUTING_KEY = "email.auth.charity.register_account"
 )
 
 type EmailRabbitmqProducer interface {
-	NotiSendRegisterAccountEmail(reqDto *SendRegisterAccountEmailRequestDto) error
+	NotiSendRegisterDonorAccountEmail(reqDto *SendRegisterDonorAccountEmailRequestDto) error
 }
 
 type emailRabbitmqProducerImpl struct {
@@ -28,7 +30,7 @@ func NewEmailRabbitmqProducer(rabbitmqSvc rabbitmqservice.RabbitmqService) Email
 	return &emailRabbitmqProducerImpl{rabbitmqSvc}
 }
 
-func (p *emailRabbitmqProducerImpl) NotiSendRegisterAccountEmail(reqDto *SendRegisterAccountEmailRequestDto) error {
+func (p *emailRabbitmqProducerImpl) NotiSendRegisterDonorAccountEmail(reqDto *SendRegisterDonorAccountEmailRequestDto) error {
 	amqpConnectionStr := fmt.Sprintf("amqp://%s:%s@message-broker:5672",
 		os.Getenv("MESSAGE_BROKER_USER"),
 		os.Getenv("MESSAGE_BROKER_PASSWORD"))
@@ -64,7 +66,7 @@ func (p *emailRabbitmqProducerImpl) NotiSendRegisterAccountEmail(reqDto *SendReg
 		ContentType: "application/json",
 		Body:        body,
 	}
-	err = p.rabbitmqSvc.Publish(ch, EMAIL_EXCHANGE_NAME, REGISTER_ACCOUNT_ROUTING_KEY, msg)
+	err = p.rabbitmqSvc.Publish(ch, EMAIL_EXCHANGE_NAME, REGISTER_DONOR_ACCOUNT_ROUTING_KEY, msg)
 	if err != nil {
 		log.Fatalf("Failed to open channel: %v", err)
 	} else {

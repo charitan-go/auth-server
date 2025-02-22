@@ -110,7 +110,7 @@ func (svc *authServiceImpl) HandleRegisterDonorRest(req *dto.RegisterDonorReques
 	}
 
 	// Send email confirm
-	svc.emailRabbitmqProducer.NotiSendRegisterAccountEmail(&email.SendRegisterAccountEmailRequestDto{
+	svc.emailRabbitmqProducer.NotiSendRegisterDonorAccountEmail(&email.SendRegisterDonorAccountEmailRequestDto{
 		Email: authModel.Email,
 		Role:  string(authModel.Role),
 	})

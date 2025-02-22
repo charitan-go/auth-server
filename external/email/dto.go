@@ -1,6 +1,8 @@
 package email
 
-type SendRegisterAccountEmailRequestDto struct {
-	Email string `json:"email"`
-	Role  string `json:"role"`
+type SendRegisterDonorAccountEmailRequestDto struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
 }
