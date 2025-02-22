@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/charitan-go/auth-server/external/email"
 	"github.com/charitan-go/auth-server/external/key"
 	"github.com/charitan-go/auth-server/external/profile"
 	"github.com/charitan-go/auth-server/internal/auth/dto"
@@ -27,11 +28,15 @@ type AuthService interface {
 }
 
 type authServiceImpl struct {
-	passwordService   PasswordService
-	jwtService        JwtService
-	r                 repository.AuthRepository
+	r repository.AuthRepository
+
+	passwordService PasswordService
+	jwtService      JwtService
+
 	profileGrpcClient profile.ProfileGrpcClient
 	keyGrpcClient     key.KeyGrpcClient
+
+	emailRabbitmqProducer email.EmailRabbitmqProducer
 }
 
 func verifyPassword(hashPassword, password string) bool {
@@ -39,8 +44,22 @@ func verifyPassword(hashPassword, password string) bool {
 	return err == nil
 }
 
-func NewAuthService(passwordService PasswordService, jwtService JwtService, r repository.AuthRepository, profileGrpcClient profile.ProfileGrpcClient, keyGrpcClient key.KeyGrpcClient) AuthService {
-	return &authServiceImpl{passwordService, jwtService, r, profileGrpcClient, keyGrpcClient}
+func NewAuthService(
+	r repository.AuthRepository,
+	passwordService PasswordService,
+	jwtService JwtService,
+	profileGrpcClient profile.ProfileGrpcClient,
+	keyGrpcClient key.KeyGrpcClient,
+	emailRabbitmqProducer email.EmailRabbitmqProducer,
+) AuthService {
+	return &authServiceImpl{
+		r,
+		passwordService,
+		jwtService,
+		profileGrpcClient,
+		keyGrpcClient,
+		emailRabbitmqProducer,
+	}
 }
 
 func (svc *authServiceImpl) HandleRegisterDonorRest(req *dto.RegisterDonorRequestDto) (*dto.RegisterResponseDto, *dto.ErrorResponseDto) {
@@ -89,6 +108,13 @@ func (svc *authServiceImpl) HandleRegisterDonorRest(req *dto.RegisterDonorReques
 	if err != nil {
 		return nil, &dto.ErrorResponseDto{Message: "Failed to save to database", StatusCode: http.StatusInternalServerError}
 	}
+
+	// Send email confirm
+	svc.emailRabbitmqProducer.NotiSendRegisterDonorAccountEmail(&email.SendRegisterDonorAccountEmailRequestDto{
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     authModel.Email,
+	})
 
 	// Return response
 	return &dto.RegisterResponseDto{Message: "Register successfully"}, nil

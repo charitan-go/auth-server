@@ -6,15 +6,16 @@ import (
 	"os"
 
 	auth "github.com/charitan-go/auth-server/internal/auth/service"
+	rabbitmqservice "github.com/charitan-go/auth-server/rabbitmq/service"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type RabbitmqServer struct {
-	rabbitmqSvc RabbitmqService
+	rabbitmqSvc rabbitmqservice.RabbitmqService
 	authSvc     auth.AuthService
 }
 
-func NewRabbitmqServer(rabbitmqSvc RabbitmqService, authSvc auth.AuthService) *RabbitmqServer {
+func NewRabbitmqServer(rabbitmqSvc rabbitmqservice.RabbitmqService, authSvc auth.AuthService) *RabbitmqServer {
 	return &RabbitmqServer{rabbitmqSvc, authSvc}
 }
 
@@ -22,9 +23,12 @@ func (srv *RabbitmqServer) startRabbitmqConsumer() error {
 	// ch, err := srv.rabbitmqSvc.ConnectRabbitmq()
 	log.Println("In function startRabbitmqConsumer")
 
+	// time.Sleep(5 * time.Second)
+
 	amqpConnectionStr := fmt.Sprintf("amqp://%s:%s@message-broker:5672",
 		os.Getenv("MESSAGE_BROKER_USER"),
 		os.Getenv("MESSAGE_BROKER_PASSWORD"))
+	log.Printf("Connection str: %s\n", amqpConnectionStr)
 	conn, err := amqp.Dial(amqpConnectionStr)
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)

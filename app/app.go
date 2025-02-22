@@ -3,6 +3,7 @@ package app
 import (
 	"log"
 
+	"github.com/charitan-go/auth-server/external/email"
 	"github.com/charitan-go/auth-server/external/key"
 	"github.com/charitan-go/auth-server/external/profile"
 	"github.com/charitan-go/auth-server/internal/auth"
@@ -98,6 +99,7 @@ func Run() {
 		auth.AuthModule,
 		profile.ProfileModule,
 		key.KeyModule,
+		email.EmailModule,
 		rabbitmq.RabbitmqModule,
 		fx.Provide(
 			rest.NewRestServer,
