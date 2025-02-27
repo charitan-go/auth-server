@@ -78,8 +78,6 @@ func (h *AuthHandler) GetMe(c echo.Context) error {
 		return c.JSON(http.StatusNonAuthoritativeInfo, dto.ErrorResponseDto{Message: "Not authorized"})
 	}
 
-	log.Println("User id is " + jwtPayload.ReadableId)
-
 	res, errRes := h.svc.HandleGetMeRest(jwtPayload)
 	if errRes != nil {
 		return c.JSON(int(errRes.StatusCode), *errRes)
