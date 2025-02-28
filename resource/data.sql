@@ -41,13 +41,13 @@ VALUES
 
 
 -- Insert charity organization accounts into the auths table
-INSERT INTO auths (email, hashed_password, role, profile_readable_id)
+INSERT INTO auths (readable_id, email, hashed_password, role, profile_readable_id)
 VALUES 
-    ('charity1@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', 'a364e55f-2b2d-4180-b29c-c1385cb3c27e'),
-    ('charity2@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '209eddd5-561f-4605-9103-07ed9f8e36b2'),
-    ('charity3@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '713a7a9f-457f-4159-bb9e-b9835f9313f3'),
-    ('charity4@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '6c648bad-4036-4240-9685-199eb7c4e164'),
-    ('charity5@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '87e36b91-1047-4b3a-ab30-617b03df537a'),
-    ('charity6@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '3c1e982f-bb78-42c9-8829-690f5ee842ed');
+    ('cf81bbc7-8990-4b9c-847d-ea0f3bc3e28a', 'charity1@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', 'a364e55f-2b2d-4180-b29c-c1385cb3c27e'),
+    ('5b08c663-a605-43e1-86dd-0941021f6383', 'charity2@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '209eddd5-561f-4605-9103-07ed9f8e36b2'),
+    ('921a99c0-47cd-4507-bc7c-bc284d15c7b9', 'charity3@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '713a7a9f-457f-4159-bb9e-b9835f9313f3'),
+    ('47fe1f6d-05c4-4ff4-9e5d-91f47b585380', 'charity4@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '6c648bad-4036-4240-9685-199eb7c4e164'),
+    ('f61746df-3de1-47bd-88ee-3705df97dbac', 'charity5@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '87e36b91-1047-4b3a-ab30-617b03df537a'),
+    ('c0132204-680d-450b-9fce-6f4f91f90dcf', 'charity6@example.com', '$2a$10$AdA8zvXzhbzs1eodny4NkuR2DkUWN27j7WU5n/z0S7LTvlmYlsJ8y', 'CHARITY', '3c1e982f-bb78-42c9-8829-690f5ee842ed');
 
 
